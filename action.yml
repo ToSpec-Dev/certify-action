@@ -41,7 +41,7 @@ inputs:
     default: "5"
   cli-version:
     description: >-
-      Immutable ToSpec-Dev/cli release tag to download (for example "v1.0.0"). The
+      Immutable ToSpec-Dev/cli release tag to download (for example "v1.0.2"). The
       matching release checksum is verified before execution.
     required: true
   traffic-command:

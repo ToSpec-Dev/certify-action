@@ -20,7 +20,7 @@ jobs:
         with:
           suite: channelrush-pms
           pat: ${{ secrets.TOSPEC_PAT }}
-          cli-version: v1.0.0
+          cli-version: v1.0.2
 ```
 
 Store a partner access token (with the `sessions:write` and `sessions:read` scopes) as
@@ -68,7 +68,7 @@ Some suites require you to declare an integration mode. Pass them one per line:
   with:
     suite: channelrush-pms
     pat: ${{ secrets.TOSPEC_PAT }}
-    cli-version: v1.0.0
+    cli-version: v1.0.2
     capabilities: |
       auth_style=oauth2
       rate_format=nested
@@ -83,7 +83,7 @@ To surface conformance drift without failing the build (e.g. on a `main` dashboa
   with:
     suite: channelrush-pms
     pat: ${{ secrets.TOSPEC_PAT }}
-    cli-version: v1.0.0
+    cli-version: v1.0.2
     fail-on: error   # a certification failure is reported, only a hard error blocks
 ```
 
