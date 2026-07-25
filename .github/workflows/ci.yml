@@ -1,0 +1,29 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      # action.yml must parse — a broken metadata file breaks every consumer.
+      - name: Validate action.yml
+        run: ruby -e 'require "yaml"; YAML.parse_file("action.yml"); puts "action.yml OK"'
+
+      # The embedded composite script must be syntactically valid bash.
+      - name: Lint embedded script
+        run: |
+          bash -n scripts/certify.sh
+          bash tests/action_test.sh
+
+      - name: Enforce pinned, verified CLI download
+        run: |
+          rg 'cli-version must be an immutable semantic release tag' scripts/certify.sh
+          rg 'sha256sum -c' scripts/certify.sh
+          test "$(rg -n 'sha256sum -c' scripts/certify.sh | cut -d: -f1)" -lt "$(rg -n 'tar -xzf' scripts/certify.sh | cut -d: -f1)"
+          test "$(rg -n 'sha256sum -c' scripts/certify.sh | cut -d: -f1)" -lt "$(rg -n 'unzip -q' scripts/certify.sh | cut -d: -f1)"

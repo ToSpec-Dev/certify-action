@@ -1,0 +1,86 @@
+name: ToSpec Certify
+description: >-
+  Certify an API integration against a ToSpec suite in CI. Starts a certification
+  session, waits for the verdict, and posts the remediation report to the build
+  summary when it fails.
+author: ToSpec
+branding:
+  icon: check-circle
+  color: green
+
+inputs:
+  suite:
+    description: Suite slug to certify against (its latest published version is used).
+    required: true
+  pat:
+    description: >-
+      Partner access token (tsp_pat_…) with the sessions:write and sessions:read
+      scopes. Pass a secret — never a literal.
+    required: true
+  url:
+    description: Portal API base URL.
+    required: false
+    default: https://api.tospec.dev
+  wait:
+    description: Wait for the session to be graded and exit by the verdict.
+    required: false
+    default: "true"
+  capabilities:
+    description: >-
+      Declared integration modes, one name=value per line (maps to repeated
+      --capability flags). Optional.
+    required: false
+    default: ""
+  timeout:
+    description: Max seconds to wait for a verdict.
+    required: false
+    default: "900"
+  poll-interval:
+    description: Status poll cadence, in seconds.
+    required: false
+    default: "5"
+  cli-version:
+    description: >-
+      Immutable ToSpec-Dev/cli release tag to download (for example "v1.2.0"). The
+      matching release checksum is verified before execution.
+    required: true
+  traffic-command:
+    description: >-
+      Optional command that generates certification traffic. It runs after the
+      session opens and before the Action waits for the verdict.
+    required: false
+    default: ""
+  fail-on:
+    description: >-
+      When to fail the step: "fail" (on a failed OR errored run), "error" (only on
+      an error — a certification failure is reported but non-blocking), or "never".
+    required: false
+    default: fail
+
+outputs:
+  result:
+    description: pass | fail | error
+    value: ${{ steps.certify.outputs.result }}
+  exit-code:
+    description: The tospec CLI exit code (0 pass, 1 fail, 2 error).
+    value: ${{ steps.certify.outputs.exit-code }}
+
+runs:
+  using: composite
+  steps:
+    - id: certify
+      shell: bash
+      env:
+        TOSPEC_URL: ${{ inputs.url }}
+        TOSPEC_PAT: ${{ inputs.pat }}
+        INPUT_SUITE: ${{ inputs.suite }}
+        INPUT_WAIT: ${{ inputs.wait }}
+        INPUT_CAPS: ${{ inputs.capabilities }}
+        INPUT_TIMEOUT: ${{ inputs.timeout }}
+        INPUT_POLL: ${{ inputs.poll-interval }}
+        INPUT_CLI_VERSION: ${{ inputs.cli-version }}
+        INPUT_TRAFFIC_COMMAND: ${{ inputs.traffic-command }}
+        INPUT_FAIL_ON: ${{ inputs.fail-on }}
+        GITHUB_ACTION_PATH: ${{ github.action_path }}
+      run: |
+        bash "$GITHUB_ACTION_PATH/scripts/certify.sh"
