@@ -1,4 +1,4 @@
-# CLAUDE.md — repo conventions for `ToSpec-Dev/certify-action`
+# AGENTS.md — repo conventions for `ToSpec-Dev/certify-action`
 
 A **composite GitHub Action** that wraps the [`tospec` CLI](https://github.com/ToSpec-Dev/cli)
 so a partner can certify their API integration against a [ToSpec](https://tospec.dev)
